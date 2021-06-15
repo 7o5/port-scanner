@@ -10,5 +10,4 @@
 
 <h2> Example: </h2>
 - python3 port-scanner.py -i [IP-address]
-
 - python3 port-scanner.py -l [Path-to-list]
