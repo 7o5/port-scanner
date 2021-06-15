@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/bin/python3
 
 import argparse
 import socket
@@ -81,18 +81,18 @@ def main(ip):
 
 #Nmap Integration (in progress)
 
-    def automate():
-       choice = '0'
-       while choice =='0':
-          print("Would you like to run Nmap or quit to terminal?")
-          print("-" * 60)
-          print("1 = Run suggested Nmap scan")
-          print("2 = Run another port scan")
-          print("3 = Exit to terminal")
-          print("-" * 60)
-          choice = input("Option Selection: ")
-          if choice == "1":
-             try:
+def automate():
+    choice = '0'
+    while choice =='0':
+        print("Would you like to run Nmap or quit to terminal?")
+        print("-" * 60)
+        print("1 = Run suggested Nmap scan")
+        print("2 = Run another port scan")
+        print("3 = Exit to terminal")
+        print("-" * 60)
+        choice = input("Option Selection: ")
+        if choice == "1":
+            try:
                 print(outfile)
                 os.system(outfile)
                 t3 = datetime.now()
@@ -101,17 +101,18 @@ def main(ip):
                 print("Combined scan completed in "+str(total1))
                 print("Press enter to quit...")
                 input()
-             except FileExistsError as e:
+            except FileExistsError as e:
                 print(e)
                 exit()
-          elif choice =="2":
-              ip_addr = input("IP Address: ")
-              main(ip_addr)
-          elif choice =="3":
-             sys.exit()
-          else:
-             print("Please make a valid selection")
-             automate()
+        elif choice =="2":
+            ip_addr = input("IP Address: ")
+            main(ip_addr)
+            automate()
+        elif choice =="3":
+            sys.exit()
+        else:
+            print("Please make a valid selection")
+            automate()
     
 
 parser = argparse.ArgumentParser(description='port scan single or multiple IP addresses')
@@ -127,7 +128,8 @@ if __name__ == '__main__':
             for i in range(0,size):
                 ip = ip_list[i].rstrip()  
                 main(ip)
-     
+            
+
     elif args.IP:
         try:
             main(args.IP)
@@ -135,4 +137,4 @@ if __name__ == '__main__':
         except KeyboardInterrupt:
             print("\nGoodbye!")
             quit()
-   
+    automate()
