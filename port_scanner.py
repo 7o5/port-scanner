@@ -95,9 +95,6 @@ def main(ip):
              try:
                 print(outfile)
                 os.system(outfile)
-                #The xsltproc is experimental and will convert XML to a HTML readable format; requires xsltproc on your machine to work
-                #convert = "xsltproc "+target+".xml -o "+target+".html"
-                #os.system(convert)
                 t3 = datetime.now()
                 total1 = t3 - t1
                 print("-" * 60)
