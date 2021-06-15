@@ -1,42 +1,141 @@
-#!/bin/python3
+#!/usr/bin/python3
 
-import sys #used to get arguments when running the script
-import socket #used to scan for ports
-from datetime import datetime #nice date and time banner for looks
+import argparse
+import socket
+import os
+import signal
+import time
+import threading
+import sys
+import subprocess
+from queue import Queue
+from datetime import datetime
 
-#Define our target
-if len(sys.argv) == 2:
-	target = socket.gethostbyname(sys.argv[1]) # translating a hostname to IPv4
-else:
-	print("Invalid amount of arguments!")
-	print("SYNTAX: python3 port_scanner.py <IPv4>")
+# Start Port scanner with clear terminal
+subprocess.call('clear', shell=True)
 
-#add pretty banner
-print("=" * 40)
-print("Scanning target "+target)
-print("Time started:"+str(datetime.now()))
+# Main Function
+def main(ip):
+    socket.setdefaulttimeout(0.30)
+    print_lock = threading.Lock()
+    discovered_ports = []
+    time.sleep(1)
+    target = ip
+    error = "SYNTAX: python3 thread_port_scanner.py" 
+    try:
+        t_ip = socket.gethostbyname(target)
+    except (UnboundLocalError, socket.gaierror):
+        print("\n[-]Invalid format. Please use a correct IP or web address[-]\n")
+        sys.exit()
+    #Banner
+    print("-" * 60)
+    print("Scanning target "+ t_ip)
+    print("Time started: "+ str(datetime.now()))
+    print("-" * 60)
+    t1 = datetime.now()
 
-try: #try to connect to port with the exceptions below the for loop
-                                
-	for port in range(1,65535):
-		s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-		socket.setdefaulttimeout(1) #if it cant connect to port in 1 sec it will move on
-		result = s.connect_ex((target,port)) #returns an error indicator. open port = 0
-		if result == 0:
-			print("Port {} is open".format(port))
-		s.close()
+    def portscan(port):
 
-except KeyboardInterrupt: #if the user does Ctrl C or one like that it will exit 
-	print("Exiting program.")
-	sys.exit()
+       s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+       
+       try:
+          conx = s.connect((t_ip, port))
+          with print_lock:
+             print("Port {} is open".format(port))
+             discovered_ports.append(str(port))
+          conx.close()
 
-except socket.gaierror: #if the hostname can not be turned to IPv4 it will exit
-	print("Hostname could not be resolved.")
-	sys.exit()
+       except (ConnectionRefusedError, AttributeError, OSError):
+          pass
 
-except socket.error: #cant make connection in general will exit
-	print("Couldn't connect ot server.")
-	sys.exit()
-		
-	
+    def threader():
+       while True:
+          worker = q.get()
+          portscan(worker)
+          q.task_done()
+      
+    q = Queue()
+     
+    #startTime = time.time()
+     
+    for x in range(200):
+       t = threading.Thread(target = threader)
+       t.daemon = True
+       t.start()
 
+    for worker in range(1, 65536):
+       q.put(worker)
+
+    q.join()
+
+    t2 = datetime.now()
+    total = t2 - t1
+    print("Port scan completed in "+str(total))
+    print("-" * 60) 
+    print("*" * 60)
+    print("nmap -p{ports} -A -T4 -vv -Pn -oN {ip} {ip}".format(ports=",".join(discovered_ports), ip=target))
+    print("*" * 60)
+    outfile = "nmap -p{ports} -A -vv -Pn -T4 -oN {ip} {ip}".format(ports=",".join(discovered_ports), ip=target)
+    t3 = datetime.now()
+    total1 = t3 - t1
+
+#Nmap Integration (in progress)
+
+    def automate():
+       choice = '0'
+       while choice =='0':
+          print("Would you like to run Nmap or quit to terminal?")
+          print("-" * 60)
+          print("1 = Run suggested Nmap scan")
+          print("2 = Run another port scan")
+          print("3 = Exit to terminal")
+          print("-" * 60)
+          choice = input("Option Selection: ")
+          if choice == "1":
+             try:
+                print(outfile)
+                os.system(outfile)
+                #The xsltproc is experimental and will convert XML to a HTML readable format; requires xsltproc on your machine to work
+                #convert = "xsltproc "+target+".xml -o "+target+".html"
+                #os.system(convert)
+                t3 = datetime.now()
+                total1 = t3 - t1
+                print("-" * 60)
+                print("Combined scan completed in "+str(total1))
+                print("Press enter to quit...")
+                input()
+             except FileExistsError as e:
+                print(e)
+                exit()
+          elif choice =="2":
+              ip_addr = input("IP Address: ")
+              main(ip_addr)
+          elif choice =="3":
+             sys.exit()
+          else:
+             print("Please make a valid selection")
+             automate()
+    
+
+parser = argparse.ArgumentParser(description='port scan single or multiple IP addresses')
+parser.add_argument('-i', '--IP', metavar='', help='single IP address to use')
+parser.add_argument('-l', '--list', metavar='', help='Path to list of IP addresses')
+args = parser.parse_args()
+
+if __name__ == '__main__':
+    if args.list:
+        with open(args.list) as f:
+            ip_list = f.readlines()
+            size = (len(ip_list) - 1)
+            for i in range(0,size):
+                ip = ip_list[i].rstrip()  
+                main(ip)
+     
+    elif args.IP:
+        try:
+            main(args.IP)
+     
+        except KeyboardInterrupt:
+            print("\nGoodbye!")
+            quit()
+   
