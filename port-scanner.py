@@ -16,6 +16,7 @@ subprocess.call('clear', shell=True)
 
 # Main Function
 def main(ip):
+    global outfile
     socket.setdefaulttimeout(0.30)
     print_lock = threading.Lock()
     discovered_ports = []
@@ -49,10 +50,10 @@ def main(ip):
           pass
 
     def threader():
-       while True:
-          worker = q.get()
-          portscan(worker)
-          q.task_done()
+        while True:
+            worker = q.get()
+            portscan(worker)
+            q.task_done()
       
     q = Queue()
      
