@@ -17,6 +17,7 @@ subprocess.call('clear', shell=True)
 # Main Function
 def main(ip):
     global outfile
+    global t1
     socket.setdefaulttimeout(0.30)
     print_lock = threading.Lock()
     discovered_ports = []
@@ -82,17 +83,18 @@ def main(ip):
 
 #Nmap Integration (in progress)
 
-def automate():
-    choice = '0'
-    while choice =='0':
-        print("Would you like to run Nmap or quit to terminal?")
-        print("-" * 60)
-        print("1 = Run suggested Nmap scan")
-        print("2 = Run another port scan")
-        print("3 = Exit to terminal")
-        print("-" * 60)
-        choice = input("Option Selection: ")
-        if choice == "1":
+def automate(check):
+    choice = check
+    while True:
+        if choice == "0":
+            print("Would you like to run Nmap or quit to terminal?")
+            print("-" * 60)
+            print("1 = Run suggested Nmap scan")
+            print("2 = Run another port scan")
+            print("3 = Exit to terminal")
+            print("-" * 60)
+            choice = input("Option Selection: ")
+        elif choice == "1":
             try:
                 print(outfile)
                 os.system(outfile)
@@ -102,40 +104,72 @@ def automate():
                 print("Combined scan completed in "+str(total1))
                 print("Press enter to quit...")
                 input()
+                sys.exit()
             except FileExistsError as e:
                 print(e)
                 exit()
-        elif choice =="2":
+        elif choice == "4":
+            try:
+                print(outfile)
+                os.system(outfile)
+                t3 = datetime.now()
+                total1 = t3 - t1
+                print("-" * 60)
+                print("Combined scan completed in "+str(total1))
+                break
+            except FileExistsError as e:
+                print(e)
+                exit()
+        elif choice == "2":
             ip_addr = input("IP Address: ")
             main(ip_addr)
-            automate()
-        elif choice =="3":
+            automate("0")
+        elif choice == "3":
             sys.exit()
         else:
             print("Please make a valid selection")
-            automate()
+            automate("0")
     
 
 parser = argparse.ArgumentParser(description='port scan single or multiple IP addresses')
 parser.add_argument('-i', '--IP', metavar='', help='single IP address to use')
 parser.add_argument('-l', '--list', metavar='', help='Path to list of IP addresses')
+parser.add_argument('-n', '--nmap', action='store_true', help='Do NMAP scan automatically after port scan')
 args = parser.parse_args()
 
 if __name__ == '__main__':
-    if args.list:
+     
+    if args.list and args.nmap:
         with open(args.list) as f:
             ip_list = f.readlines()
-            size = (len(ip_list) - 1)
+            size = len(ip_list)
             for i in range(0,size):
-                ip = ip_list[i].rstrip()  
+                ip = ip_list[i].rstrip()
                 main(ip)
-            
+                automate("4") 
 
-    elif args.IP:
+    elif args.list:
+        with open(args.list) as f:
+            ip_list = f.readlines()
+            size = len(ip_list)
+            for i in range(0,size):
+                ip = ip_list[i].rstrip()
+                main(ip)
+        automate("0") 
+       
+    elif args.IP and args.nmap:
         try:
             main(args.IP)
-     
+            automate("1")
         except KeyboardInterrupt:
             print("\nGoodbye!")
             quit()
-    automate()
+    
+    elif args.IP:
+        try:
+            main(args.IP)
+            automate("0")  
+        except KeyboardInterrupt:
+            print("\nGoodbye!")
+            quit()
+    
