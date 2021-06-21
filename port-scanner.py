@@ -13,17 +13,26 @@ from datetime import datetime
 
 # Start Port scanner with clear terminal
 subprocess.call('clear', shell=True)
+print("-" * 60)
+print("""
+ ____            _       ____  
+|  _ \ ___  _ __| |_    / ___|  ___ __ _ _ __  _ __   ___ _ __
+| |_) / _ \| '__| __|___\___ \ / __/ _` | '_ \| '_ \ / _ \ '__|
+|  __/ (_) | |  | ||_____|__) | (_| (_| | | | | | | |  __/ |
+|_|   \___/|_|   \__|   |____/ \___\__,_|_| |_|_| |_|\___|_|
+Made By Sancho 
+""")   
+
 
 # Main Function
 def main(ip):
     global outfile
     global t1
-    socket.setdefaulttimeout(0.30)
+    socket.setdefaulttimeout(0.4)
     print_lock = threading.Lock()
     discovered_ports = []
     time.sleep(1)
-    target = ip
-    error = "SYNTAX: python3 thread_port_scanner.py" 
+    target = ip 
     try:
         t_ip = socket.gethostbyname(target)
     except (UnboundLocalError, socket.gaierror):
@@ -58,8 +67,6 @@ def main(ip):
       
     q = Queue()
      
-    #startTime = time.time()
-     
     for x in range(200):
        t = threading.Thread(target = threader)
        t.daemon = True
@@ -81,10 +88,10 @@ def main(ip):
     t3 = datetime.now()
     total1 = t3 - t1
 
-#Nmap Integration (in progress)
 
-def automate(check):
-    choice = check
+#autmomatic NMAP scan
+
+def automate(choice):
     while True:
         if choice == "0":
             print("Would you like to run Nmap or quit to terminal?")
@@ -138,25 +145,16 @@ parser.add_argument('-n', '--nmap', action='store_true', help='Do NMAP scan auto
 args = parser.parse_args()
 
 if __name__ == '__main__':
-     
     if args.list and args.nmap:
-        with open(args.list) as f:
-            ip_list = f.readlines()
-            size = len(ip_list)
-            for i in range(0,size):
-                ip = ip_list[i].rstrip()
-                main(ip)
-                automate("4") 
+        for i in open(args.list):
+            main(i.rstrip())
+            automate("4") 
 
     elif args.list:
-        with open(args.list) as f:
-            ip_list = f.readlines()
-            size = len(ip_list)
-            for i in range(0,size):
-                ip = ip_list[i].rstrip()
-                main(ip)
-        automate("0") 
-       
+        for i in open(args.list):
+            main(i.rstrip())
+        automate("0")
+
     elif args.IP and args.nmap:
         try:
             main(args.IP)
