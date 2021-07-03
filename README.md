@@ -10,7 +10,9 @@ Usage:
 
 
 Example:
-- python3 port-scanner.py -i [IP-address]
-- python3 port-scanner.py -l [Path-to-list]
-- python3 port-scanner.py -n -i [IP-address] 
-- python3 port-scanner.py -n -l [Path-to-list]
+'''
+python3 port-scanner.py -i [IP-address]
+python3 port-scanner.py -l [Path-to-list]
+python3 port-scanner.py -n -i [IP-address] 
+python3 port-scanner.py -n -l [Path-to-list]
+'''
