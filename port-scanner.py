@@ -14,37 +14,38 @@ from datetime import datetime
 # Start Port scanner with clear terminal
 subprocess.call('clear', shell=True)
 print("-" * 60)
-print("""
- ____            _       ____  
+print(""" ____            _       ____  
 |  _ \ ___  _ __| |_    / ___|  ___ __ _ _ __  _ __   ___ _ __
 | |_) / _ \| '__| __|___\___ \ / __/ _` | '_ \| '_ \ / _ \ '__|
 |  __/ (_) | |  | ||_____|__) | (_| (_| | | | | | | |  __/ |
 |_|   \___/|_|   \__|   |____/ \___\__,_|_| |_|_| |_|\___|_|
-Made By Sancho 
-""")   
+Made By Sancho""")   
 
 
 # Main Function
 def main(ip):
     global outfile
     global t1
-    socket.setdefaulttimeout(0.4)
+    socket.setdefaulttimeout(0.3)
     print_lock = threading.Lock()
     discovered_ports = []
-    time.sleep(1)
+    time.sleep(3)
     target = ip 
     try:
-        t_ip = socket.gethostbyname(target)
+        hostname = socket.gethostbyaddr(target)
+    except:
+        hostname = ("","")
+    try:
+        t_ip = socket.gethostbyname(target) 
     except (UnboundLocalError, socket.gaierror):
         print("\n[-]Invalid format. Please use a correct IP or web address[-]\n")
         sys.exit()
     #Banner
     print("-" * 60)
-    print("Scanning target "+ t_ip)
+    print("Scanning target "+ t_ip +" ("+hostname[0]+")")
     print("Time started: "+ str(datetime.now()))
     print("-" * 60)
-    t1 = datetime.now()
-
+    t1 = datetime.now() 
     def portscan(port):
 
        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -91,7 +92,7 @@ def main(ip):
 
 #autmomatic NMAP scan
 
-def automate(choice):
+def automate(choice,exit):
     while True:
         if choice == "0":
             print("Would you like to run Nmap or quit to terminal?")
@@ -101,6 +102,8 @@ def automate(choice):
             print("3 = Exit to terminal")
             print("-" * 60)
             choice = input("Option Selection: ")
+            if choice == "1":
+                exit = "yes"
         elif choice == "1":
             try:
                 print(outfile)
@@ -109,33 +112,24 @@ def automate(choice):
                 total1 = t3 - t1
                 print("-" * 60)
                 print("Combined scan completed in "+str(total1))
-                print("Press enter to quit...")
-                input()
-                sys.exit()
-            except FileExistsError as e:
-                print(e)
-                exit()
-        elif choice == "4":
-            try:
-                print(outfile)
-                os.system(outfile)
-                t3 = datetime.now()
-                total1 = t3 - t1
-                print("-" * 60)
-                print("Combined scan completed in "+str(total1))
-                break
+                if exit == "yes":
+                    print("Press enter to quit...")
+                    input()
+                    sys.exit()
+                elif exit == "no":
+                    break
             except FileExistsError as e:
                 print(e)
                 exit()
         elif choice == "2":
             ip_addr = input("IP Address: ")
             main(ip_addr)
-            automate("0")
+            automate("0","")
         elif choice == "3":
             sys.exit()
         else:
             print("Please make a valid selection")
-            automate("0")
+            automate("0","")
     
 
 parser = argparse.ArgumentParser(description='port scan single or multiple IP addresses')
@@ -145,20 +139,21 @@ parser.add_argument('-n', '--nmap', action='store_true', help='Do NMAP scan auto
 args = parser.parse_args()
 
 if __name__ == '__main__':
+    
     if args.list and args.nmap:
         for i in open(args.list):
             main(i.rstrip())
-            automate("4") 
+            automate("1","no") 
 
     elif args.list:
         for i in open(args.list):
             main(i.rstrip())
-        automate("0")
+        automate("0","")
 
     elif args.IP and args.nmap:
         try:
             main(args.IP)
-            automate("1")
+            automate("1","yes")
         except KeyboardInterrupt:
             print("\nGoodbye!")
             quit()
@@ -166,7 +161,7 @@ if __name__ == '__main__':
     elif args.IP:
         try:
             main(args.IP)
-            automate("0")  
+            automate("0","")  
         except KeyboardInterrupt:
             print("\nGoodbye!")
             quit()
