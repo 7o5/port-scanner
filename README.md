@@ -1,12 +1,11 @@
-<h1> ____            _       ____
+ ____            _       ____
 |  _ \ ___  _ __| |_    / ___|  ___ __ _ _ __  _ __   ___ _ __
 | |_) / _ \| '__| __|___\___ \ / __/ _` | '_ \| '_ \ / _ \ '__|
 |  __/ (_) | |  | ||_____|__) | (_| (_| | | | | | | |  __/ |
 |_|   \___/|_|   \__|   |____/ \___\__,_|_| |_|_| |_|\___|_|
-</h1>
 
 
-![badge](https://img.shields.io/github/downloads/lSANCHOl/port-scanner/total.svg)]()
+![badge](https://img.shields.io/github/downloads/lSANCHOl/port-scanner/total)
 
 Usage:
 - run port-scanner.py -h for help menu
