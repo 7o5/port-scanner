@@ -3,7 +3,7 @@
 
 <p align="center">
     <img alt="ViewCount" src="https://views.whatilearened.today/views/github/lSANCHOl/port-scanner.svg">
-    [![GitHub Clones](https://img.shields.io/badge/dynamic/json?color=success&label=Clone&query=count&url=<url>?raw=True&logo=github)](https://github.com/lSANCHOl/port-scanner)
+    <a href="https://github.com/lSANCHOl/port-scanner"><img alt="GitHub Clones" src="https://img.shields.io/badge/dynamic/json?color=success&label=Clone&query=count&url=<url>?raw=True&logo=github"></a>
 
 </p>
 
