@@ -1,7 +1,10 @@
 <h1> Port Scanner </h1>
 
 
-![badge](https://img.shields.io/github/downloads/lSANCHOl/port-scanner/total)
+<p align="center">
+    <img alt="ViewCount" src="https://views.whatilearened.today/views/github/lSANCHOl/port-scanner.svg">
+    <a href="https://github.com/lSANCHOl/port-scanner"><img alt="GitHub Clones" src="https://img.shields.io/badge/dynamic/json?color=success&label=Clone&query=count&url=https://github.com/lSANCHOl/blob/master/clone.json?raw=True&logo=github"></a>
+</p>
 
 Usage:
 - run port-scanner.py -h for help menu
