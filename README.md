@@ -7,10 +7,18 @@
 </p>
 
 Usage:
-- run port-scanner.py -h for help menu
-- use -l to scan IPs from a list
-- use -i to scan a single IP
-- use -n to autmoatically nmap scan after a single or each port scan
+'''
+usage: port-scanner [-h] [-i] [-l] [-n] [-q]
+
+port scan single or multiple IP addresses
+
+optional arguments:
+  -h, --help    show this help message and exit
+  -i , --IP     single IP address to use
+  -l , --list   Path to list of IP addresses
+  -n, --nmap    Do NMAP scan automatically after port scan
+  -q, --quiet   Don't print banner at the start
+'''
 
 
 Example:
