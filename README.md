@@ -7,7 +7,7 @@
 </p>
 
 Usage:
-'''
+```
 usage: port-scanner [-h] [-i] [-l] [-n] [-q]
 
 port scan single or multiple IP addresses
@@ -18,7 +18,7 @@ optional arguments:
   -l , --list   Path to list of IP addresses
   -n, --nmap    Do NMAP scan automatically after port scan
   -q, --quiet   Don't print banner at the start
-'''
+```
 
 
 Example:
