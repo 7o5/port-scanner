@@ -12,18 +12,18 @@ from queue import Queue
 from datetime import datetime
 
 # Start Port scanner with clear terminal
-subprocess.call('clear', shell=True)
-print("-" * 60)
-print(""" ____            _       ____  
-|  _ \ ___  _ __| |_    / ___|  ___ __ _ _ __  _ __   ___ _ __
-| |_) / _ \| '__| __|___\___ \ / __/ _` | '_ \| '_ \ / _ \ '__|
-|  __/ (_) | |  | ||_____|__) | (_| (_| | | | | | | |  __/ |
-|_|   \___/|_|   \__|   |____/ \___\__,_|_| |_|_| |_|\___|_|
-Made By Sancho""")   
+#subprocess.call('clear', shell=True)
 
+def banner():
+    print("\n"+"-"*50)
+    print("""╔═╗╔═╗╦═╗╔╦╗  ┌─┐┌─┐┌─┐┌┐┌┌┐┌┌─┐┬─┐
+╠═╝║ ║╠╦╝ ║   └─┐│  ├─┤││││││├┤ ├┬┘
+╩  ╚═╝╩╚═ ╩   └─┘└─┘┴ ┴┘└┘┘└┘└─┘┴└─By Sancho""")
 
 # Main Function
-def main(ip):
+def main(ip,ban):
+    if ban == 1:
+        banner() 
     global outfile
     global t1
     socket.setdefaulttimeout(0.3)
@@ -41,10 +41,10 @@ def main(ip):
         print("\n[-]Invalid format. Please use a correct IP or web address[-]\n")
         sys.exit()
     #Banner
-    print("-" * 60)
+    print("-" * 50)
     print("Scanning target "+ t_ip +" ("+hostname[0]+")")
     print("Time started: "+ str(datetime.now()))
-    print("-" * 60)
+    print("-" * 50)
     t1 = datetime.now() 
     def portscan(port):
 
@@ -53,7 +53,8 @@ def main(ip):
        try:
           conx = s.connect((t_ip, port))
           with print_lock:
-             print("Port {} is open".format(port))
+             print("[+] Port {} ({})".format(port,socket.getservbyport(port)))
+             #print(socket.getservbyport(port))
              discovered_ports.append(str(port))
           conx.close()
 
@@ -81,10 +82,10 @@ def main(ip):
     t2 = datetime.now()
     total = t2 - t1
     print("Port scan completed in "+str(total))
-    print("-" * 60) 
-    print("*" * 60)
+    print("-" * 50) 
+    print("*" * 50)
     print("nmap -p{ports} -A -T4 -vv -Pn -oN {ip} {ip}".format(ports=",".join(discovered_ports), ip=target))
-    print("*" * 60)
+    print("*" * 50)
     outfile = "nmap -p{ports} -A -vv -Pn -T4 -oN {ip} {ip}".format(ports=",".join(discovered_ports), ip=target)
     t3 = datetime.now()
     total1 = t3 - t1
@@ -96,11 +97,11 @@ def automate(choice,exit):
     while True:
         if choice == "0":
             print("Would you like to run Nmap or quit to terminal?")
-            print("-" * 60)
+            print("-" * 50)
             print("1 = Run suggested Nmap scan")
             print("2 = Run another port scan")
             print("3 = Exit to terminal")
-            print("-" * 60)
+            print("-" * 50)
             choice = input("Option Selection: ")
             if choice == "1":
                 exit = "yes"
@@ -110,7 +111,7 @@ def automate(choice,exit):
                 os.system(outfile)
                 t3 = datetime.now()
                 total1 = t3 - t1
-                print("-" * 60)
+                print("-" * 50)
                 print("Combined scan completed in "+str(total1))
                 if exit == "yes":
                     print("Press enter to quit...")
@@ -123,7 +124,7 @@ def automate(choice,exit):
                 exit()
         elif choice == "2":
             ip_addr = input("IP Address: ")
-            main(ip_addr)
+            main(ip_addr,0)
             automate("0","")
         elif choice == "3":
             sys.exit()
@@ -136,23 +137,51 @@ parser = argparse.ArgumentParser(description='port scan single or multiple IP ad
 parser.add_argument('-i', '--IP', metavar='', help='single IP address to use')
 parser.add_argument('-l', '--list', metavar='', help='Path to list of IP addresses')
 parser.add_argument('-n', '--nmap', action='store_true', help='Do NMAP scan automatically after port scan')
+parser.add_argument('-q', '--quiet', action='store_true', help='Don\'t print banner at the start')
+
 args = parser.parse_args()
 
 if __name__ == '__main__':
     
-    if args.list and args.nmap:
+    if args.list and args.nmap and args.quiet:
         for i in open(args.list):
-            main(i.rstrip())
+            main(i.rstrip(),0)
+            automate("1","no") 
+
+    elif args.list and args.quiet:
+        for i in open(args.list):
+            main(i.rstrip(),0)
+        automate("0","")
+
+    elif args.IP and args.nmap and args.quiet:
+        try:
+            main(args.IP,0)
+            automate("1","yes")
+        except KeyboardInterrupt:
+            print("\nGoodbye!")
+            quit()
+    
+    elif args.IP and args.quiet:
+        try:
+            main(args.IP,0)
+            automate("0","")  
+        except KeyboardInterrupt:
+            print("\nGoodbye!")
+            quit()
+   
+    elif args.list and args.nmap:
+        for i in open(args.list):
+            main(i.rstrip(),1)
             automate("1","no") 
 
     elif args.list:
         for i in open(args.list):
-            main(i.rstrip())
+            main(i.rstrip(),1)
         automate("0","")
 
     elif args.IP and args.nmap:
         try:
-            main(args.IP)
+            main(args.IP,1)
             automate("1","yes")
         except KeyboardInterrupt:
             print("\nGoodbye!")
@@ -160,7 +189,7 @@ if __name__ == '__main__':
     
     elif args.IP:
         try:
-            main(args.IP)
+            main(args.IP,1)
             automate("0","")  
         except KeyboardInterrupt:
             print("\nGoodbye!")
